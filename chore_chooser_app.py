@@ -1,6 +1,5 @@
 import tkinter as tk
 import random
-from time import sleep
 from datetime import datetime
 from pathlib import Path
 
@@ -59,6 +58,7 @@ class ChoreChooser():
         self.root.columnconfigure(3, weight=20)
         self.root.rowconfigure((0,1,2,3,4,5,6,7), weight=1)
 
+
         # Placing main screen widgets
         self.instructions_label.grid(row=0, column=0)
         self.main_label.grid(row=0, column=0, sticky="se")
@@ -73,11 +73,14 @@ class ChoreChooser():
         self.results_display.grid(row=2, column=0, sticky='se')
         self.save_button.grid(row=6, column=0, sticky='se')
 
+
         # Frame with relief to organize the chore distribution results
         self.frame = tk.Frame(self.root, height=150, width=300, borderwidth=2, relief=tk.RAISED)
         self.frame.place(x=75, y=235)
 
 
+        # Setting active status to limit generate button clicks
+        self.active = True
 
         # Start application
         self.root.mainloop()
@@ -104,22 +107,25 @@ class ChoreChooser():
             Then chore lists are randomly shuffled then distributed to each 
             person's assignment"""
         
-        # Sleep to seem like results are calculating
-        sleep(0.5)
+        if self.active:
 
-        if self.default_status.get() == 1:
-            self.main_chores.append("Kitchen")
-            self.main_chores.append("Bathrooms")
-            self.side_chores.append("Floors")
-            self.side_chores.append("Toy Room")
+            if self.default_status.get() == 1:
+                self.main_chores.append("Kitchen")
+                self.main_chores.append("Bathrooms")
+                self.side_chores.append("Floors")
+                self.side_chores.append("Toy Room")
 
-        random.shuffle(self.main_chores)
-        random.shuffle(self.side_chores)
+            random.shuffle(self.main_chores)
+            random.shuffle(self.side_chores)
 
-        self.assign_chores(self.main_chores, self.laura_main, self.alex_main)
-        self.assign_chores(self.side_chores, self.laura_side, self.alex_side)
+            self.assign_chores(self.main_chores, self.laura_main, self.alex_main)
+            self.assign_chores(self.side_chores, self.laura_side, self.alex_side)
 
-        self.show_results()
+            self.show_results()
+
+            # Caps the generate button to only allow for once 
+            # unless the clear button is pressed
+            self.active = False
         
 
     def assign_chores(self, list1, list2, list3):
@@ -169,6 +175,9 @@ class ChoreChooser():
         self.laura_side_results.destroy()
         self.alex_main_results.destroy()
         self.alex_side_results.destroy()
+
+        # Resetting active flag so that the generate button works again
+        self.active = True
 
     def save_results(self):
         """Saves results in a separate text file to reference"""
